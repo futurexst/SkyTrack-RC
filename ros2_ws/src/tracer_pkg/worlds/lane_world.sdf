@@ -1,0 +1,362 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="lane_world">
+
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics">
+    </plugin>
+
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
+    </plugin>
+
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- Light -->
+    <light name="sun" type="directional">
+      <pose>0 0 10 0 0 0</pose>
+      <cast_shadows>false</cast_shadows>
+      <direction>0 0 -1</direction>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+    </light>
+
+    <!-- Ground -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>8 8 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>8 8 0.01</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- =========================
+         ImageJ-based S-shaped lane
+         Rotated 90 deg clockwise
+         line width = 0.02 m
+         ========================= -->
+
+    <!-- =========================
+         ImageJ-based S-shaped lane
+         Rotated 90 deg clockwise + horizontally flipped
+         line width = 0.02 m
+         ========================= -->
+
+    <!-- =========================
+         ImageJ-based S-shaped lane
+         Rotated 90 deg clockwise + horizontally flipped
+         line width = 0.02 m
+         ========================= -->
+
+    <model name="lane_imgj_01">
+      <static>true</static>
+      <pose>-0.2181 -0.5895 0.012 0 0 2.7903</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3592 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_02">
+      <static>true</static>
+      <pose>-0.3920 -0.6292 0.012 0 0 -1.6229</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.2033 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_03">
+      <static>true</static>
+      <pose>-0.3619 -0.7828 0.012 0 0 -0.9750</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1259 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_04">
+      <static>true</static>
+      <pose>-0.2357 -0.8887 0.012 0 0 -0.5347</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.2114 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_05">
+      <static>true</static>
+      <pose>-0.0486 -0.9470 0.012 0 0 -0.0458</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1927 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_06">
+      <static>true</static>
+      <pose>0.1386 -0.9205 0.012 0 0 0.3277</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1921 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_07">
+      <static>true</static>
+      <pose>0.2931 -0.8384 0.012 0 0 0.6781</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1632 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_08">
+      <static>true</static>
+      <pose>0.3584 -0.7060 0.012 0 0 1.5491</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1625 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_09">
+      <static>true</static>
+      <pose>0.3196 -0.5656 0.012 0 0 2.1725</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1435 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_10">
+      <static>true</static>
+      <pose>0.1607 -0.4491 0.012 0 0 2.6900</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.2630 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_11">
+      <static>true</static>
+      <pose>-0.0318 -0.3900 0.012 0 0 3.1178</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1484 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_12">
+      <static>true</static>
+      <pose>-0.1721 -0.3635 0.012 0 0 2.7843</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1413 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_13">
+      <static>true</static>
+      <pose>-0.2622 -0.2840 0.012 0 0 1.9815</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1194 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_14">
+      <static>true</static>
+      <pose>-0.2798 -0.1596 0.012 0 0 1.4824</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1400 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_15">
+      <static>true</static>
+      <pose>-0.2331 -0.0395 0.012 0 0 0.8918</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1293 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_16">
+      <static>true</static>
+      <pose>-0.1465 0.0311 0.012 0 0 0.4164</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1004 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_17">
+      <static>true</static>
+      <pose>0.0547 0.0338 0.012 0 0 -0.1132</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3127 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_18">
+      <static>true</static>
+      <pose>0.2560 -0.0068 0.012 0 0 -0.4637</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.1027 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_19">
+      <static>true</static>
+      <pose>0.3346 -0.0625 0.012 0 0 -0.7854</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.0924 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_20">
+      <static>true</static>
+      <pose>0.3814 -0.1322 0.012 0 0 -1.2068</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.0794 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_21">
+      <static>true</static>
+      <pose>0.3964 -0.2178 0.012 0 0 -1.5526</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.0971 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="lane_imgj_22">
+      <static>true</static>
+      <pose>0.2375 -0.2452 0.012 0 0 3.0098</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><box><size>0.3224 0.0200 0.003</size></box></geometry>
+          <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Robot -->
+    <include>
+      <uri>model://lane_bot</uri>
+      <pose>-0.02 -0.22 0.05 0 0 0</pose>
+    </include>
+
+    <!-- Overhead camera -->
+    <!-- Overhead camera -->
+    <model name="overhead_camera_model">
+      <static>true</static>
+      <pose>-0.05 -0.4 2.0 0 1.5708 0</pose>
+
+      <link name="overhead_camera_link">
+        <sensor name="overhead_camera" type="camera">
+          <always_on>true</always_on>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
+          <topic>/image_raw</topic>
+
+          <camera>
+            <horizontal_fov>0.7175</horizontal_fov>
+            <image>
+              <width>960</width>
+              <height>720</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>10.0</far>
+            </clip>
+          </camera>
+        </sensor>
+      </link>
+    </model>
+
+  </world>
+</sdf>
