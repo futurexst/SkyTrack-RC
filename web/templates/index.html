@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MISSION_CTRL // Self-driving Vehicle</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- 배경 효과 레이어 -->
+  <div class="bg-grid"></div>
+  <div class="bg-vignette"></div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="hdr">
+    <div class="hdr-brand">
+      <div class="brand-mark">◆</div>
+      <div class="brand-text">
+        <span class="brand-1">SELF-DRIVING</span>
+        <span class="brand-2">MISSION_CTRL / TEL_v2.4</span>
+      </div>
+    </div>
+
+    <div class="hdr-cell hdr-mt">
+      <span class="hdr-k">MISSION TIME</span>
+      <span class="hdr-v hdr-v-glow" id="mission-time">T+ 00:00:00</span>
+    </div>
+
+    <div class="hdr-cell hdr-status">
+      <span class="hdr-k">SYS STATUS</span>
+      <span class="hdr-v">
+        <span class="pip" id="status-pip"></span>
+        <span id="system-status">NOMINAL</span>
+      </span>
+    </div>
+
+    <div class="hdr-cell hdr-weather" id="weather-widget">
+      <span class="hdr-k">ENVIRONMENT</span>
+      <span class="hdr-v">
+        <span class="weather-icon" id="weather-icon">·</span>
+        <span id="weather-summary">--</span>
+        <span class="hdr-sep">/</span>
+        <span id="weather-temp">--°</span>
+        <span class="hdr-sep">/</span>
+        <span id="weather-humidity">습도 --%</span>
+      </span>
+    </div>
+
+    <div class="hdr-cell hdr-news">
+      <span class="hdr-k">NEWS_FEED</span>
+      <div class="ticker">
+        <div class="ticker-track" id="ticker-track">
+          <span class="ticker-item">// 뉴스 로딩 중...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hdr-cell" style="min-width: 0; padding: 0 14px;">
+      <span class="hdr-k">KR <span id="util-clock-ampm"></span></span>
+      <span class="hdr-v" style="color: var(--ph); text-shadow: 0 0 4px var(--ph-glow); font-family: var(--f-mono);">
+        <!-- <span class="pip pip-green"></span> -->
+        <span id="util-clock">------</span>
+      </span>
+    </div>
+
+    <div class="hdr-cell hdr-user">
+      <span class="hdr-k">OPERATOR</span>
+      <span class="hdr-v">hyundai</span>
+    </div>
+
+
+
+    <div class="hdr-cell hdr-utils">
+      <span class="util util-logout">LOGOUT</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar">
+      <ul class="nav">
+        <li class="nav-item"><span class="nav-num">01</span><span class="nav-label">즐겨찾기</span></li>
+        <li class="nav-item"><span class="nav-num">02</span><span class="nav-label">대시보드</span></li>
+        <li class="nav-item active"><span class="nav-num">03</span><span class="nav-label">모니터링</span></li>
+        <li class="nav-item"><span class="nav-num">04</span><span class="nav-label">로봇 운영</span></li>
+        <li class="nav-item"><span class="nav-num">05</span><span class="nav-label">시나리오</span></li>
+        <li class="nav-item"><span class="nav-num">06</span><span class="nav-label">로봇 서비스</span></li>
+        <li class="nav-item"><span class="nav-num">07</span><span class="nav-label">로그</span></li>
+        <li class="nav-item"><span class="nav-num">08</span><span class="nav-label">설정</span></li>
+      </ul>
+
+      <!-- 시간 표시 -->
+      <div class="sidebar-foot" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+      <!-- 시간 표시 -->
+      <div style="
+        width: 100%;
+        font-family: var(--f-mono);
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        line-height: 1.8;
+        border-bottom: 1px dashed var(--bd-faint);
+        padding-bottom: 6px;
+        margin-bottom: 2px;
+        text-align: center;
+      ">
+
+        <!-- UPLINK -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="pip pip-green"></span>
+          <div class="sb-foot-text">
+            <span>UPLINK</span>
+            <span class="sb-foot-val">0.0.0.0<br>:9090</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN GRID ============ -->
+    <main class="main">
+
+      <!-- Analytics (왼쪽) -->
+      <section class="card analytics-card">
+        <header class="card-hdr">
+          <span class="card-id">[ TEL_001 ]</span>
+          <span class="card-title">// ANALYTICS</span>
+          <span class="ana-cmd-badge" id="ana-cmd-badge" data-cmd="0">CMD: DUAL</span>
+          <span class="card-tag" id="analytics-tag">LIVE · 3CH</span>
+        </header>
+        <div class="card-body analytics-body" id="analytics-body">
+          <!-- 메트릭 수치 행 -->
+          <div class="ana-metrics">
+            <div class="ana-metric">
+              <span class="ana-metric-label">LATERAL_ERR</span>
+              <span class="ana-metric-val" id="lv-lat" style="color:#6dd9b0">—</span>
+              <span class="ana-metric-unit">px</span>
+            </div>
+            <div class="ana-metric-sep"></div>
+            <div class="ana-metric">
+              <span class="ana-metric-label">HEADING_ERR</span>
+              <span class="ana-metric-val" id="lv-head" style="color:#e8a445">—</span>
+              <span class="ana-metric-unit">°</span>
+            </div>
+            <div class="ana-metric-spacer"></div>
+            <div class="ana-thresh-legend">
+              <span class="ana-thresh-item" style="border-color:#e8a445">±12°</span>
+              <span class="ana-thresh-item" style="border-color:#ec5959">±30°</span>
+            </div>
+          </div>
+          <!-- Chart.js 캔버스 -->
+          <div class="ana-canvas-wrap">
+            <canvas id="ana-chartjs"></canvas>
+          </div>
+          <!-- 텔레메트리 테이블 (다른 variant에서 사용) -->
+          <div class="tel-table" id="tel-table" style="display:none">
+            <div class="tel-row ok"><span class="tel-k">VEL_L</span><span class="tel-v" id="tt-vl">0.00</span><span class="tel-u">m/s</span></div>
+            <div class="tel-row ok"><span class="tel-k">VEL_R</span><span class="tel-v" id="tt-vr">0.00</span><span class="tel-u">m/s</span></div>
+            <div class="tel-row"><span class="tel-k">ACC</span><span class="tel-v" id="tt-acc">0.12</span><span class="tel-u">m/s²</span></div>
+            <div class="tel-row hot"><span class="tel-k">YAW_R</span><span class="tel-v" id="tt-yaw">2.4</span><span class="tel-u">°/s</span></div>
+            <div class="tel-row"><span class="tel-k">ENC_L</span><span class="tel-v" id="tt-encl">12380</span><span class="tel-u">tk</span></div>
+            <div class="tel-row"><span class="tel-k">ENC_R</span><span class="tel-v" id="tt-encr">12412</span><span class="tel-u">tk</span></div>
+            <div class="tel-row ok"><span class="tel-k">PWM_L</span><span class="tel-v" id="tt-pwml">142</span><span class="tel-u">/255</span></div>
+            <div class="tel-row ok"><span class="tel-k">PWM_R</span><span class="tel-v" id="tt-pwmr">144</span><span class="tel-u">/255</span></div>
+            <div class="tel-row"><span class="tel-k">TEMP</span><span class="tel-v" id="tt-temp">38.2</span><span class="tel-u">°C</span></div>
+            <div class="tel-row"><span class="tel-k">FAN</span><span class="tel-v" id="tt-fan">2840</span><span class="tel-u">rpm</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 비디오 (가운데) -->
+      <section class="card video-card">
+        <header class="card-hdr">
+          <span class="card-id">[ CAM_PRIM ]</span>
+          <span class="card-title">// PERCEPTION_FEED</span>
+          <span class="live"><span class="live-dot"></span><span>LIVE</span></span>
+        </header>
+        <div class="card-body video-body">
+          <div class="video-stage">
+            <img id="perception-stream" src="/video_feed" alt="perception feed" />
+            <span class="vc tl"></span>
+            <span class="vc tr"></span>
+            <span class="vc bl"></span>
+            <span class="vc br"></span>
+
+            <div class="video-readout-br" id="overlay-status">
+              <span style="color: var(--tx-3);">SRC</span>
+              <span class="rd-v">/real/perception/debug_image</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 우측 레일: Health + Drive State -->
+      <aside class="rail">
+        <section class="card health-card health-merged">
+          <header class="card-hdr">
+            <span class="card-id">[ HLTH_002 ]</span>
+            <span class="card-title">// ROBOT_HEALTH</span>
+            <span class="card-tag">SYS · DIAG</span>
+          </header>
+          <div class="card-body health-body health-body-compact">
+            <div class="met-line">
+              <span class="met-k">RSSI</span>
+              <span class="met-val"><span id="metric-rssi">—</span><span class="met-u">dBm</span></span>
+              <div class="met-bar"><span class="met-bar-fill" data-bind="metric-rssi" style="width:0%"></span></div>
+            </div>
+            <div class="met-line">
+              <span class="met-k">WIFI</span>
+              <span class="met-val"><span id="metric-wifi">—</span><span class="met-u" id="metric-wifi-ch">CH —</span></span>
+              <div class="met-bar"><span class="met-bar-fill" data-bind="metric-wifi" style="width:0%"></span></div>
+            </div>
+            <div class="met-line">
+              <span class="met-k">LOOP</span>
+              <span class="met-val"><span id="metric-loop">—</span><span class="met-u">Hz</span></span>
+              <div class="met-bar"><span class="met-bar-fill" data-bind="metric-loop" style="width:0%"></span></div>
+            </div>
+            <div class="met-line">
+              <span class="met-k">HEAP</span>
+              <span class="met-val"><span id="metric-heap">—</span><span class="met-u">KB</span></span>
+              <div class="met-bar"><span class="met-bar-fill" data-bind="metric-heap" style="width:0%"></span></div>
+            </div>
+
+          <div class="health-gauges">
+            <div class="health-gauges-hdr">
+              <span class="hg-id">[ GAU_006 ]</span>
+              <span class="hg-title">// ANALOG_GAUGES</span>
+              <span class="hg-tag">L · R SPEED</span>
+            </div>
+            <div class="health-gauges-row">
+
+              <!-- L_SPEED 게이지 -->
+              <div class="gauge-wrap">
+                <svg class="gauge-svg" viewBox="0 0 100 72" id="gauge-speed-svg">
+                  <g id="gauge-speed-ticks"></g>
+                  <path d="M 12 60 A 38 38 0 0 1 88 60" fill="none" stroke="rgba(140,200,175,0.12)" stroke-width="2"/>
+                  <path id="gauge-speed-arc" d="M 12 60 A 38 38 0 0 1 88 60" fill="none" stroke="#6dd9b0" stroke-width="2" stroke-dasharray="120" stroke-dashoffset="90" stroke-linecap="butt"/>
+                  <line id="gauge-speed-needle" x1="50" y1="60" x2="50" y2="26" stroke="#6dd9b0" stroke-width="1.5"/>
+                  <circle cx="50" cy="60" r="3" fill="#0c1220" stroke="#6dd9b0" stroke-width="1"/>
+                </svg>
+                <span class="gauge-label">L_SPEED</span>
+                <span class="gauge-readout"><span id="left-speed">0.00</span><span class="gu">m/s</span></span>
+              </div>
+
+              <!-- R_SPEED 게이지 -->
+              <div class="gauge-wrap alt">
+                <svg class="gauge-svg" viewBox="0 0 100 72" id="gauge-rpm-svg">
+                  <g id="gauge-rpm-ticks"></g>
+                  <path d="M 12 60 A 38 38 0 0 1 88 60" fill="none" stroke="rgba(140,200,175,0.12)" stroke-width="2"/>
+                  <path id="gauge-rpm-arc" d="M 12 60 A 38 38 0 0 1 88 60" fill="none" stroke="#e8a445" stroke-width="2" stroke-dasharray="120" stroke-dashoffset="90" stroke-linecap="butt"/>
+                  <line id="gauge-rpm-needle" x1="50" y1="60" x2="50" y2="26" stroke="#e8a445" stroke-width="1.5"/>
+                  <circle cx="50" cy="60" r="3" fill="#0c1220" stroke="#e8a445" stroke-width="1"/>
+                </svg>
+                <span class="gauge-label">R_SPEED</span>
+                <span class="gauge-readout"><span id="right-speed">0.00</span><span class="gu">m/s</span></span>
+              </div>
+
+            </div>
+
+            <!-- 총 거리 바 -->
+            <div style="display:flex; flex-direction:column; gap:4px; margin-top:10px;">
+              <div style="display:flex; justify-content:space-between; font-family:var(--f-mono); font-size:9px; letter-spacing:0.14em; color:var(--tx-3);">
+                <span>DIST</span>
+                <span><span id="distance-value" style="color:var(--ph); font-weight:700;">0.00</span><span style="color:var(--tx-3); margin-left:3px;">m</span></span>
+              </div>
+              <div style="height:4px; background:rgba(125,249,192,0.07); position:relative; overflow:hidden; border:1px solid var(--bd-faint);">
+                <span id="dist-bar-fill" style="display:block; position:absolute; left:0; top:0; bottom:0; width:0%; background:linear-gradient(90deg,var(--ph-dim),var(--ph)); box-shadow:0 0 6px var(--ph-glow); transition:width .3s ease;"></span>
+              </div>
+            </div>
+
+            <!-- 헤딩 오차 -->
+            <div style="display:flex; justify-content:space-between; align-items:center; font-family:var(--f-mono); font-size:9px; letter-spacing:0.14em; padding:6px 10px; background:var(--bg-elev); border:1px solid var(--bd-faint); margin-top:8px;">
+              <span style="color:var(--tx-3);">HEADING ERR</span>
+              <span id="heading-error-val" style="font-size:14px; font-weight:700; color:var(--ph); text-shadow:0 0 6px var(--ph-glow);">0.0<span style="font-size:9px; color:var(--tx-3); margin-left:2px;">deg</span></span>
+            </div>
+
+          </div>
+          </div>
+        </section>
+
+
+
+      </aside>
+
+      <!-- ============ BOTTOM ROW ============ -->
+<section class="bottom-row">
+        <!-- 좌측 칼럼: MAP_005 (위) + SYS_LOG (아래) 세로 스택 -->
+        <div class="bottom-stack-col">
+
+          <!-- 좌표 변환 행렬 (R → C) -->
+          <section class="card telemetry-card">
+            <header class="card-hdr">
+              <span class="card-id">[ MAP_005 ]</span>
+              <span class="card-title">// COORD_TRANSFORM</span>
+              <span class="card-tag">R → C</span>
+            </header>
+            <div class="card-body matrix-body">
+              <!-- 수식 형태로 행렬 표기 -->
+              <div class="mat-eq">
+                <div class="mat-bracket">
+                  <div class="mat-vec">
+                    <div class="mat-cell mat-out">x<sub>C</sub></div>
+                    <div class="mat-cell mat-out">y<sub>C</sub></div>
+                  </div>
+                </div>
+                <div class="mat-eq-sym">=</div>
+                <div class="mat-frac">
+                  <div class="mat-frac-top">1</div>
+                  <div class="mat-frac-bot" id="mat-s">4.27</div>
+                </div>
+                <div class="mat-bracket">
+                  <div class="mat-2x2">
+                    <div class="mat-cell" id="mat-a">+1.000</div>
+                    <div class="mat-cell" id="mat-b">+0.000</div>
+                    <div class="mat-cell" id="mat-c">+0.000</div>
+                    <div class="mat-cell" id="mat-d">+1.000</div>
+                  </div>
+                </div>
+                <div class="mat-bracket">
+                  <div class="mat-vec">
+                    <div class="mat-cell">x<sub>R</sub> − <span id="mat-cx">0</span></div>
+                    <div class="mat-cell">y<sub>R</sub> − <span id="mat-cy">0</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 결과 표시 (B-1: 입력 (0,0) 변환 결과) -->
+              <div class="mat-result">
+                <div class="mat-result-row">
+                  <span class="mat-r-k">θ</span>
+                  <span class="mat-r-v" id="mat-theta">0.00</span>
+                  <span class="mat-r-u">°</span>
+                </div>
+                <div class="mat-result-sep"></div>
+                <div class="mat-result-row">
+                  <span class="mat-r-k">x<sub>C</sub></span>
+                  <span class="mat-r-v mat-r-out" id="mat-xc">0.00</span>
+                  <span class="mat-r-u">px</span>
+                </div>
+                <div class="mat-result-row">
+                  <span class="mat-r-k">y<sub>C</sub></span>
+                  <span class="mat-r-v mat-r-out" id="mat-yc">0.00</span>
+                  <span class="mat-r-u">px</span>
+                </div>
+                <!-- <div class="mat-input-note">@ (x<sub>R</sub>, y<sub>R</sub>) = (0, 0)</div> -->
+              </div>
+            </div>
+          </section>
+
+          <!-- 시스템 로그 -->
+          <section class="card log-card">
+            <header class="card-hdr">
+              <span class="card-id">[ SYS_LOG ]</span>
+              <span class="card-title">// SYSTEM_TELEMETRY</span>
+              <span class="log-count"><span id="log-count">0</span> events</span>
+            </header>
+            <div class="card-body log-body">
+              <div class="log-list" id="perception-log-list"></div>
+            </div>
+          </section>
+
+        </div><!-- /.bottom-stack-col -->
+
+        <!-- 가제보 -->
+        <section class="card sim-card">
+          <header class="card-hdr">
+            <span class="card-id">[ SIM_VIEW ]</span>
+            <span class="card-title">// GAZEBO_FEED</span>
+            <span class="card-tag">SIM</span>
+          </header>
+          <div class="card-body sim-body">
+            <div class="sim-stage">
+              <img src="http://localhost:8080/stream?topic=/sim/perception/debug_image"
+                   alt="Gazebo Simulation Stream" />
+              <span class="vc tl"></span>
+              <span class="vc tr"></span>
+              <span class="vc bl"></span>
+              <span class="vc br"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 원격 제어 -->
+        <section class="card remote-card" style="order:2">
+          <header class="card-hdr">
+            <span class="card-id">[ CTRL_004 ]</span>
+            <span class="card-title">// REMOTE_INPUT</span>
+            <label class="toggle">
+              <input type="checkbox" id="remote-toggle" checked>
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </header>
+          <div class="card-body remote-body" id="remote-body" data-variant="joystick">
+            <div class="kbd-hint">방향키 / SPACE 매핑됨</div>
+            <div class="speed-slider" id="remote-speed-slider" style="display:none">
+              <div class="ss-row"><span>SPEED_LIMIT</span><span><span class="ss-v" id="rss-val">60</span> %</span></div>
+              <input type="range" id="rss-input" min="0" max="100" value="60" />
+            </div>
+            <div class="motor-bars" id="remote-motor-bars" style="display:none">
+              <div class="motor-bar"><div class="mb-k">MOTOR_L</div><div class="mb-v"><span id="mb-l-val">0.00</span><span class="mu">m/s</span></div><div class="mb-track"><div class="mb-fill" id="mb-l-fill" style="width:0%"></div></div></div>
+              <div class="motor-bar alt"><div class="mb-k">MOTOR_R</div><div class="mb-v"><span id="mb-r-val">0.00</span><span class="mu">m/s</span></div><div class="mb-track"><div class="mb-fill" id="mb-r-fill" style="width:0%"></div></div></div>
+            </div>
+            <div class="joy">
+              <button class="joy-btn" data-command="FL">◤</button>
+              <button class="joy-btn joy-up" data-command="F">▲</button>
+              <button class="joy-btn" data-command="FR">◥</button>
+              <button class="joy-btn" data-command="L">◀</button>
+              <button class="joy-btn joy-stop" data-command="S">■</button>
+              <button class="joy-btn" data-command="R">▶</button>
+              <button class="joy-btn" data-command="BL">◣</button>
+              <button class="joy-btn" data-command="B">▼</button>
+              <button class="joy-btn" data-command="BR">◢</button>
+            </div>
+            <div class="cmd-readout">
+              <span class="met-k">LAST_CMD</span>
+              <span class="cmd-val" id="last-command">S</span>
+            </div>
+
+            <div class="sb-qa">
+              <button class="sb-qa-btn sb-qa-stop" id="qa-estop" title=" E">E-STOP</button>
+              <button class="sb-qa-btn" id="qa-home" title="H">RTH</button>
+              <button class="sb-qa-btn" id="qa-tweaks" title="">TWEAKS</button>
+
+            </div>
+
+          </div>
+        </section>
+
+        <!-- 미션 진행률 / 체크리스트 -->
+        <section class="card mission-card" style="order:1">
+          <header class="card-hdr">
+            <span class="card-id">[ MIS_007 ]</span>
+            <span class="card-title">// MISSION_PROGRESS</span>
+            <span class="card-tag" id="mission-status">RUNNING</span>
+          </header>
+          <div class="card-body mission-body">
+            <div class="mission-meta">
+              <span>WAYPOINT 03 / 05</span>
+              <span class="mm-pct"><span id="mission-pct">42</span><span class="pct-u">%</span></span>
+            </div>
+            <div class="mission-bar">
+              <div class="mission-bar-fill" id="mission-bar-fill" style="width:42%"></div>
+              <div class="mission-bar-ticks"></div>
+            </div>
+            <ul class="mission-list" id="mission-list">
+              <li class="ms-step done"><span class="ms-num">01</span><span class="ms-label">시스템 부트 / 캘리브레이션</span><span class="ms-t">T+00:42</span></li>
+              <li class="ms-step done"><span class="ms-num">02</span><span class="ms-label">START_POS 도달</span><span class="ms-t">T+02:11</span></li>
+              <li class="ms-step active"><span class="ms-num">03</span><span class="ms-label">경로 추종 / WP_03</span><span class="ms-t">진행중</span></li>
+              <li class="ms-step pending"><span class="ms-num">04</span><span class="ms-label">장애물 회피 시퀀스</span><span class="ms-t">대기</span></li>
+              <li class="ms-step pending"><span class="ms-num">05</span><span class="ms-label">END_POS 도착 / 셧다운</span><span class="ms-t">대기</span></li>
+            </ul>
+          </div>
+        </section>
+    </main>
+  </div>
+
+  <!-- ============ TWEAKS PANEL ============ -->
+  <div id="tw-panel">
+    <div class="tw-hdr">
+      <span class="tw-hdr-t">// TWEAKS</span>
+      <button class="tw-close" id="tw-close">×</button>
+    </div>
+    <div class="tw-body">
+      <div class="tw-section">
+        <div class="tw-section-t">ANALYTICS CARD</div>
+        <div class="tw-radio" data-tw="analytics">
+          <button data-val="waveform" class="on">WAVE</button>
+          <button data-val="multiline">MULTI</button>
+          <button data-val="dense">TABLE</button>
+        </div>
+      </div>
+      <div class="tw-section">
+        <div class="tw-section-t">REMOTE CONTROL</div>
+        <div class="tw-radio" data-tw="remote">
+          <button data-val="joystick" class="on">9-PAD</button>
+          <button data-val="dpad-pro">D-PRO</button>
+          <button data-val="gauge-pad">GAUGE</button>
+        </div>
+      </div>
+      <div class="tw-section">
+        <div class="tw-section-t">GLOW LEVEL</div>
+        <div class="tw-radio" data-tw="glow">
+          <button data-val="off">OFF</button>
+          <button data-val="low" class="on">LOW</button>
+          <button data-val="high">HIGH</button>
+        </div>
+      </div>
+      <div class="tw-section">
+        <div class="tw-section-t">DEMO MODE (FRONTEND ONLY)</div>
+        <button class="tw-toggle-btn" id="tw-mock">MOCK_DATA · OFF</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
